@@ -1,64 +1,71 @@
-import {
-  DOMParser,
-  Element,
-} from "https://deno.land/x/deno_dom/deno-dom-wasm.ts";
+// import { getBomSummary } from "./bom.ts";
+// getBomSummary();
 
-function getBomSummaryHtml() {
-  const url = "http://www.bom.gov.au/places/tas/hobart";
-  return fetch(url).then((r) => r.text());
+import { load } from "https://deno.land/std@0.210.0/dotenv/mod.ts";
+
+const env = await load();
+
+const { SOLAR_PASSWORD, SOLAR_USERNAME } = env;
+
+const baseUrl = "https://portal.solaranalytics.com.au";
+const tokenUrl = "/api/v3/token";
+const liveSiteDataUrl = "/api/v3/live_site_data";
+
+const siteId = 313156;
+
+async function getSolarToken() {
+  const headers = new Headers();
+  headers.append(
+    "Authorization",
+    `Basic ${btoa(SOLAR_USERNAME + ":" + SOLAR_PASSWORD)}`,
+  );
+
+  const res = await fetch(`${baseUrl}${tokenUrl}`, { headers });
+  const json = await res.json();
+  return json as TokenResponse;
 }
 
-type BomSummary = {
-  rain: {
-    time: string;
-    rainfall: string;
-    chance: string;
-  }[];
+let token: TokenResponse | null = null;
+
+async function getSolarSummary() {
+  const tokenExpired = token && new Date(token.expires) < new Date();
+  if (!token || tokenExpired) {
+    token = await getSolarToken();
+  }
+
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+
+  const params = new URLSearchParams();
+  params.append("site_id", String(siteId));
+  params.append("utc_hour", formatDate(startOfToday));
+  params.append("last_six", "false");
+  params.append("last_hour", "true");
+  params.append("battery_data", "false");
+
+  const headers = new Headers();
+  headers.append("Authorization", `Bearer ${token.token}`);
+
+  const res = await fetch(`${baseUrl}${liveSiteDataUrl}?${params}`, {
+    headers,
+  });
+  if (!res.ok) {
+    throw new Error(`Failed to fetch solar data: ${res.statusText}`);
+  }
+
+  const json = await res.text();
+  console.log(json);
+}
+
+type TokenResponse = {
+  token: string;
+  expires: string;
+  duration: number;
 };
 
-async function getBomSummary() {
-  let html: string;
-  try {
-    html = await getBomSummaryHtml();
-  } catch (e) {
-    console.error("Failed to request BOM data", e);
-    return;
-  }
+getSolarSummary();
 
-  const document = new DOMParser().parseFromString(html, "text/html");
-  if (!document) {
-    throw new Error("Failed to parse HTML");
-  }
-
-  const result: BomSummary = {
-    rain: [],
-  };
-
-  const summary = document.querySelectorAll(".pme table tbody tr");
-
-  let first = true;
-  for (const s of summary) {
-    if (first) {
-      first = false;
-      continue;
-    }
-
-    const t = (s as Element).querySelector(".time");
-    const r = (s as Element).querySelector(".amt");
-    const c = (s as Element).querySelector(".coaf");
-
-    if (!t || !r || !c) {
-      continue;
-    }
-
-    result.rain.push({
-      time: t.textContent?.trim() || "",
-      rainfall: r.textContent?.trim() || "",
-      chance: c.textContent?.trim() || "",
-    });
-  }
-
-  console.log(result);
+function formatDate(d: Date) {
+  const s = d.toISOString();
+  return s.substring(0, s.length - 5);
 }
-
-getBomSummary();
