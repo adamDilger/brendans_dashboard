@@ -58,5 +58,5 @@ export async function getBomSummary() {
     });
   }
 
-  console.log(result);
+  return result;
 }
