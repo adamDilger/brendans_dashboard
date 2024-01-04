@@ -18,7 +18,6 @@ type TokenResponse = {
 };
 
 async function getSolarToken() {
-  console.log("Logging in with ", SOLAR_USERNAME);
   const headers = new Headers();
   headers.append(
     "Authorization",
@@ -156,10 +155,12 @@ async function getSolarData() {
 export async function getSolarDataSummary() {
   const { siteData, liveData } = await getSolarData();
 
+  // these can have empty arrays if requesting within the first
+  // minute of the hour
   const lastestLive = liveData.data[liveData.data.length - 1];
   const latestSite = siteData.data[siteData.data.length - 1];
 
-  const liveTimeStamp = new Date(lastestLive.t_stamp).toLocaleTimeString(
+  const liveTimeStamp = new Date(lastestLive?.t_stamp).toLocaleTimeString(
     "en-AU",
     {
       timeZone: "Australia/Hobart",
@@ -167,7 +168,7 @@ export async function getSolarDataSummary() {
     },
   );
 
-  const siteTimeStamp = new Date(latestSite.t_stamp).toLocaleDateString(
+  const siteTimeStamp = new Date(latestSite?.t_stamp).toLocaleDateString(
     "en-AU",
     {
       timeZone: "Australia/Hobart",

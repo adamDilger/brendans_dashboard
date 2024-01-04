@@ -4,7 +4,7 @@ import {
 } from "https://deno.land/x/deno_dom/deno-dom-wasm.ts";
 
 function getBomSummaryHtml() {
-  const url = "http://www.bom.gov.au/places/tas/hobart";
+  const url = "http://www.bom.gov.au/places/tas/montrose";
   return fetch(url).then((r) => r.text());
 }
 
@@ -21,8 +21,7 @@ export async function getBomSummary() {
   try {
     html = await getBomSummaryHtml();
   } catch (e) {
-    console.error("Failed to request BOM data", e);
-    return;
+    throw Error("Failed to request BOM data: " + e);
   }
 
   const document = new DOMParser().parseFromString(html, "text/html");
@@ -51,12 +50,19 @@ export async function getBomSummary() {
       continue;
     }
 
+    const time = t.textContent
+      ?.trim()
+      ?.replace(/ /g, "")
+      ?.replaceAll(":00", "");
+
     result.rain.push({
-      time: t.textContent?.trim() || "",
+      time: time || "",
       rainfall: r.textContent?.trim() || "",
       chance: c.textContent?.trim() || "",
     });
   }
+
+  result.rain.reverse();
 
   return result;
 }
