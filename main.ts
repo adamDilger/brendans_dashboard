@@ -1,17 +1,21 @@
 import { getBomSummary } from "./bom.ts";
 import { getSolarDataSummary } from "./solarAnalytics.ts";
 
-(async function () {
+Deno.serve(async (_req: Request) => {
   const s = new Date();
   const [bom, solar] = await Promise.all([
     getBomSummary(),
     getSolarDataSummary(),
   ]);
 
-  console.log(bom);
-  console.log(solar);
-
   const e = new Date();
-  // print elapsed time in milliseconds
-  console.log("Total request time:", e.getTime() - s.getTime() + "ms");
-})();
+  const elapsedMillis = e.getTime() - s.getTime() + "ms";
+
+  return new Response(
+    JSON.stringify({
+      ...bom,
+      ...solar,
+      requestTime: elapsedMillis,
+    }),
+  );
+});
