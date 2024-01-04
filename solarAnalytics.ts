@@ -142,6 +142,7 @@ async function getSolarData() {
       siteId,
       gran: "day",
       tStart: new Date(),
+      tEnd: new Date(),
       all: true,
     }),
   ]);
