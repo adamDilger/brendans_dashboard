@@ -1,8 +1,7 @@
-import { load } from "https://deno.land/std@0.210.0/dotenv/mod.ts";
+import "https://deno.land/std@0.210.0/dotenv/load.ts";
 
-const env = await load();
-
-const { SOLAR_PASSWORD, SOLAR_USERNAME } = env;
+const SOLAR_PASSWORD = Deno.env.get("SOLAR_PASSWORD");
+const SOLAR_USERNAME = Deno.env.get("SOLAR_USERNAME");
 
 const baseUrl = "https://portal.solaranalytics.com.au";
 const tokenUrl = "/api/v3/token";
@@ -19,6 +18,7 @@ type TokenResponse = {
 };
 
 async function getSolarToken() {
+  console.log("Logging in with ", SOLAR_USERNAME);
   const headers = new Headers();
   headers.append(
     "Authorization",
