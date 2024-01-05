@@ -48,7 +48,7 @@ Deno.serve(async (req: Request) => {
   o += `Day_TimeStamp: ${solar.dayTimeStamp}\n`;
 
   o += `\n--- Sensibo Temp ---\n`;
-  o += `Current_Temp: ${sensibo ? `${sensibo.value}°C` : "n/a"}\n`;
+  o += `Current_Temp: ${sensibo ? `${sensibo.value}*C` : "n/a"}\n`;
 
   return new Response(o);
 });

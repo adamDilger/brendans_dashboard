@@ -31,12 +31,15 @@ export async function getBomSummary() {
     throw new Error("Failed to parse HTML");
   }
 
-  const currentTemp =
-    document.querySelector("li.airT")?.textContent?.replaceAll(/ /g, "") ||
-    "n/a";
-  const todaysMax =
-    document.querySelector("dd.max")?.textContent?.replaceAll(/ /g, "") ||
-    "n/a";
+  const toSafeTemp = (temp?: string) => {
+    if (!temp) return "n/a";
+    return temp.replaceAll(/ /g, "").replaceAll("°", "*");
+  };
+
+  const currentTemp = toSafeTemp(
+    document.querySelector("li.airT")?.textContent,
+  );
+  const todaysMax = toSafeTemp(document.querySelector("dd.max")?.textContent);
 
   const result: BomSummary = {
     currentTemp,
