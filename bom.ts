@@ -9,6 +9,8 @@ function getBomSummaryHtml() {
 }
 
 type BomSummary = {
+  currentTemp: string;
+  todaysMax: string;
   rain: {
     time: string;
     rainfall: string;
@@ -29,7 +31,16 @@ export async function getBomSummary() {
     throw new Error("Failed to parse HTML");
   }
 
+  const currentTemp =
+    document.querySelector("li.airT")?.textContent?.replaceAll(/ /g, "") ||
+    "n/a";
+  const todaysMax =
+    document.querySelector("dd.max")?.textContent?.replaceAll(/ /g, "") ||
+    "n/a";
+
   const result: BomSummary = {
+    currentTemp,
+    todaysMax,
     rain: [],
   };
 
@@ -52,17 +63,15 @@ export async function getBomSummary() {
 
     const time = t.textContent
       ?.trim()
-      ?.replace(/ /g, "")
+      ?.replace(/ (.m)/g, "$1")
       ?.replaceAll(":00", "");
 
     result.rain.push({
       time: time || "",
-      rainfall: r.textContent?.trim() || "",
+      rainfall: r.textContent?.trim()?.replaceAll(/ /g, "") || "",
       chance: c.textContent?.trim() || "",
     });
   }
-
-  result.rain.reverse();
 
   return result;
 }

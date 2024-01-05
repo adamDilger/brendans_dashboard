@@ -1,5 +1,3 @@
-import "https://deno.land/std@0.210.0/dotenv/load.ts";
-
 const SOLAR_PASSWORD = Deno.env.get("SOLAR_PASSWORD");
 const SOLAR_USERNAME = Deno.env.get("SOLAR_USERNAME");
 
@@ -165,7 +163,7 @@ export async function getSolarDataSummary() {
     "en-AU",
     {
       timeZone: "Australia/Hobart",
-      timeStyle: "short",
+      timeStyle: "medium",
     },
   );
 
