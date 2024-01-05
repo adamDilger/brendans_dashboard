@@ -3,13 +3,15 @@ import "https://deno.land/std@0.210.0/dotenv/load.ts";
 import { getBomSummary } from "./bom.ts";
 import { getSolarDataSummary } from "./solarAnalytics.ts";
 import { getSensiboSummary } from "./sensibo.ts";
+import { getQuoteOfTheDay } from "./quotes.ts";
 
 Deno.serve(async (req: Request) => {
   const s = new Date();
-  const [bom, solar, sensibo] = await Promise.all([
+  const [bom, solar, sensibo, quote] = await Promise.all([
     getBomSummary(),
     getSolarDataSummary(),
     getSensiboSummary(),
+    getQuoteOfTheDay(),
   ]);
 
   const e = new Date();
@@ -20,6 +22,8 @@ Deno.serve(async (req: Request) => {
       JSON.stringify({
         ...bom,
         ...solar,
+        ...sensibo,
+        ...quote,
         requestTime: elapsedMillis,
       }),
     );
@@ -49,6 +53,10 @@ Deno.serve(async (req: Request) => {
 
   o += `\n--- Sensibo Temp ---\n`;
   o += `Current_Temp: ${sensibo ? `${sensibo.value}*C` : "n/a"}\n`;
+
+  o += `\n--- Quote of the day ---\n`;
+  o += `Quote: ${quote.quote}\n`;
+  o += `Quote_Author: ${quote.author}\n`;
 
   return new Response(o);
 });
