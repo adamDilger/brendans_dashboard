@@ -4,6 +4,7 @@ import { getBomSummary } from "./bom.ts";
 import { getSolarDataSummary } from "./solarAnalytics.ts";
 import { getSensiboSummary } from "./sensibo.ts";
 import { getQuoteOfTheDay } from "./quotes.ts";
+import { getDailyRandomBabyName } from "./babyNames.ts";
 
 Deno.serve(async (req: Request) => {
   const s = new Date();
@@ -13,6 +14,8 @@ Deno.serve(async (req: Request) => {
     getSensiboSummary(),
     getQuoteOfTheDay(),
   ]);
+
+  const babyName = getDailyRandomBabyName();
 
   const e = new Date();
   const elapsedMillis = e.getTime() - s.getTime() + "ms";
@@ -57,6 +60,9 @@ Deno.serve(async (req: Request) => {
   o += `\n--- Quote of the day ---\n`;
   o += `Quote: ${quote.quote}\n`;
   o += `Quote_Author: ${quote.author}\n`;
+
+  o += `\n--- Baby Name ---\n`;
+  o += `Daily_Baby_Name: ${babyName}\n`;
 
   return new Response(o);
 });
