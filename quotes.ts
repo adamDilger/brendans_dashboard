@@ -7,10 +7,19 @@ const fallback = {
   quote: "The quote of the day cannot be found.",
 };
 
-export async function getQuoteOfTheDay() {
+export async function getQuoteOfTheDay(): Promise<
+  { author: string; quote: string }
+> {
   const key = new Date().toLocaleDateString("en-AU", {
     timeZone: "Australia/Hobart",
   });
+
+  if (key === "15/04/2024") {
+    return {
+      quote: "The baby will be born on the 21st of April 2024 :)",
+      author: "Bud",
+    };
+  }
 
   if (!cache.has(key)) {
     const data = await fetchQuoteOfTheDay();
@@ -28,9 +37,8 @@ async function fetchQuoteOfTheDay() {
   const res = await fetch(`${url}`);
   if (!res.ok) {
     throw new Error(
-      `Failed to fetch quote of the day: ${
-        res.statusText
-      }: ${await res.text()}`,
+      `Failed to fetch quote of the day: ${res.statusText}: ${await res
+        .text()}`,
     );
   }
 
