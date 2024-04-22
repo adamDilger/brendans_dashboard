@@ -159,6 +159,14 @@ export async function getSolarDataSummary() {
   const lastestLive = liveData.data[liveData.data.length - 1];
   const latestSite = siteData.data[siteData.data.length - 1];
 
+  const liveTimeStamp = new Date(lastestLive?.t_stamp).toLocaleTimeString(
+    "en-AU",
+    {
+      timeZone: "Australia/Hobart",
+      timeStyle: "medium",
+    },
+  );
+
   if (!lastestLive || !latestSite) {
     return {
       liveConsumed: "-",
@@ -174,14 +182,6 @@ export async function getSolarDataSummary() {
       dayTimeStamp: "-",
     }
   }
-
-  const liveTimeStamp = new Date(lastestLive?.t_stamp).toLocaleTimeString(
-    "en-AU",
-    {
-      timeZone: "Australia/Hobart",
-      timeStyle: "medium",
-    },
-  );
 
   const siteTimeStamp = new Date(latestSite?.t_stamp).toLocaleDateString(
     "en-AU",
