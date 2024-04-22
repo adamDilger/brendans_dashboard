@@ -159,6 +159,22 @@ export async function getSolarDataSummary() {
   const lastestLive = liveData.data[liveData.data.length - 1];
   const latestSite = siteData.data[siteData.data.length - 1];
 
+  if (!lastestLive || !latestSite) {
+    return {
+      liveConsumed: "-",
+      liveGenerated: "-",
+      liveTimeStamp,
+  
+      dayConsumed: "-",
+      dayGenerated: "-",
+      dayHotWater: "-",
+      dayAirCon: "-",
+      dayLighting: "-",
+      dayPowerpoint: "-",
+      dayTimeStamp: "-",
+    }
+  }
+
   const liveTimeStamp = new Date(lastestLive?.t_stamp).toLocaleTimeString(
     "en-AU",
     {
