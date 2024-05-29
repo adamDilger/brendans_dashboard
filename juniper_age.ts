@@ -11,5 +11,5 @@ export function getJuniperAge() {
   );
   const diffMinutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
 
-  return `Juniper: ${diffDays} days, ${diffHours} hours, ${diffMinutes} minutes old.`;
+  return `${diffDays} days, ${diffHours} hours, ${diffMinutes} minutes old.`;
 }
